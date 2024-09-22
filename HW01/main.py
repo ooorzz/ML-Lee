@@ -30,10 +30,12 @@ config = {
 }
 
 # Load data
-# 把target_only改为true，尝试只考虑是否阳性的那两个feature
-tr_set = prep_dataloader(tr_path, "train", config["batch_size"], target_only=False)
-dv_set = prep_dataloader(tr_path, "dev", config["batch_size"], target_only=False)
-tt_set = prep_dataloader(tt_path, "test", config["batch_size"], target_only=False)
+# feature_select的选项：Correlation, Lasso, KBest+f, KBest+mutual, None(默认)
+tr_set, selected_feats = prep_dataloader(
+    tr_path, "train", config["batch_size"], feature_select="Correlation"
+)
+dv_set = prep_dataloader(tr_path, "dev", config["batch_size"], feats=selected_feats)
+tt_set = prep_dataloader(tt_path, "test", config["batch_size"], feats=selected_feats)
 
 # Train model
 model = NeuralNet(tr_set.dataset.dim).to(device)
